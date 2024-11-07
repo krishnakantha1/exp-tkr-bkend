@@ -59,6 +59,15 @@ f : function of the signature handlerWithDA
 */
 func (s *Server) bindDA(f handlerWithDA) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+		if r.Method == http.MethodOptions {
+			return
+		}
+
 		f(s.dataAccess, w, r)
 	}
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/joho/godotenv"
@@ -24,9 +25,9 @@ func loadEnvVariables() {
 
 	port, err := utils.GetEnv("PORT")
 	if len(port) == 0 || err != nil {
-		port = ":8080"
+		port = "8080"
 	}
 
-	server.Init(m, port)
+	server.Init(m, fmt.Sprint(":", port))
 
 }

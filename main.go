@@ -17,7 +17,7 @@ func main() {
 
 func loadEnvVariables() {
 	if err := godotenv.Load(); err != nil {
-		log.Fatal("Could not get environment variables: ", err)
+		log.Println("Could not get environment variables: ", err)
 	}
 
 	m := mongodb.Init("DB_URL", "DATABASE_NAME")

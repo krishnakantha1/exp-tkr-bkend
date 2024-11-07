@@ -7,6 +7,7 @@ import (
 
 	"github.com/krishnakantha1/expenseTrackerBackend/dataaccess/mongodb"
 	"github.com/krishnakantha1/expenseTrackerBackend/server"
+	"github.com/krishnakantha1/expenseTrackerBackend/utils"
 )
 
 func main() {
@@ -21,6 +22,11 @@ func loadEnvVariables() {
 
 	m := mongodb.Init("DB_URL", "DATABASE_NAME")
 
-	server.Init(m, ":8080")
+	port, err := utils.GetEnv("PORT")
+	if len(port) == 0 || err != nil {
+		port = ":8080"
+	}
+
+	server.Init(m, port)
 
 }

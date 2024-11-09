@@ -13,6 +13,10 @@ func BadRequestResponse(w http.ResponseWriter, msg ...string) {
 	writeErrorResponse(http.StatusBadRequest, w, msg...)
 }
 
+func RequestNotAllowedResponse(w http.ResponseWriter) {
+	writeErrorResponse(http.StatusMethodNotAllowed, w, "method not allowed")
+}
+
 func ServerErrorResponse(w http.ResponseWriter, msg ...string) {
 	writeErrorResponse(http.StatusInternalServerError, w, msg...)
 }

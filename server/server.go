@@ -6,6 +6,7 @@ import (
 
 	da "github.com/krishnakantha1/expenseTrackerBackend/dataaccess"
 	h "github.com/krishnakantha1/expenseTrackerBackend/handlers"
+	"github.com/krishnakantha1/expenseTrackerBackend/utils"
 )
 
 type handlerWithDA func(da.DataAccess, http.ResponseWriter, *http.Request)
@@ -41,30 +42,38 @@ func Init(dataAccess da.DataAccess, port string) {
 Binds the urls to a handler
 */
 func (s *Server) BindHandlers() {
-	s.smux.HandleFunc("GET /api/ping/{id}", s.bindDA(h.Ping))
+	s.smux.HandleFunc("/api/ping/{id}", s.bindDA(h.Ping, http.MethodGet))
 
 	//auth
-	s.smux.HandleFunc("POST /api/auth/v1/login", s.bindDA(h.Login))
-	s.smux.HandleFunc("POST /api/auth/v1/login-jwt", s.bindDA(h.LoginWithJWT))
+	s.smux.HandleFunc("/api/auth/v1/login", s.bindDA(h.Login, http.MethodPost))
+	s.smux.HandleFunc("/api/auth/v1/login-jwt", s.bindDA(h.LoginWithJWT, http.MethodPost))
 
 	//expense
-	s.smux.HandleFunc("POST api/expense/v1/ingest", s.bindDA(h.ExpenseIngestion))
+	s.smux.HandleFunc("api/expense/v1/ingest", s.bindDA(h.ExpenseIngestion, http.MethodPost))
 }
 
 /*
 returns a http.HandlerFunc which calls the function provided in the argument.
 This is used to provide DataAccessInterface to the handler func
 
-f : function of the signature handlerWithDA
+Params:
+
+	f : function of the signature handlerWithDA
+	allowedMethod (string): the current http method thats allowed
 */
-func (s *Server) bindDA(f handlerWithDA) http.HandlerFunc {
+func (s *Server) bindDA(f handlerWithDA, allowedMethod string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, FETCH")
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 		if r.Method == http.MethodOptions {
+			return
+		}
+
+		if r.Method != allowedMethod {
+			utils.RequestNotAllowedResponse(w)
 			return
 		}
 
